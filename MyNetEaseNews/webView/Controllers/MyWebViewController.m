@@ -27,6 +27,7 @@
   [self setupRequest];
 //    self.fd_prefersNavigationBarHidden = YES;
     
+    
 }
 
 - (void)initWebView {
