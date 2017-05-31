@@ -13,7 +13,8 @@
 //#import "MyNetEaseNews-swift.h"
 #import "UIImage+color.h"
 #import "AnimationBar.h"
-@interface MyTabBarViewController ()<UITabBarControllerDelegate>
+#import "PYSearch.h"
+@interface MyTabBarViewController ()<UITabBarControllerDelegate,PYSearchViewControllerDelegate>
 {
     UIViewController *zhiboVC;
 }
@@ -74,13 +75,31 @@
         leftBar = [[UIBarButtonItem alloc]initWithCustomView:self.homeLeftBar];
         leftBar.tintColor = [UIColor whiteColor];
         [self.homeLeftBar animation];
-    
+        
+        rightBar = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"searchAction"] style:UIBarButtonItemStylePlain target:self action:@selector(gotoSearchAction)];
+         rightBar.tintColor = [UIColor whiteColor];
+     
     }
     self.navigationItem.leftBarButtonItem = leftBar;
     self.navigationItem.rightBarButtonItem = rightBar;
     
     self.navigationController.navigationBarHidden = [viewController isKindOfClass:[MyViewController class]];
 
+    
+}
+
+- (void)gotoSearchAction
+{
+      NSArray *hotSeaches = @[@"Java", @"Python", @"Objective-C", @"Swift", @"C", @"C++", @"PHP", @"C#", @"Perl", @"Go", @"JavaScript", @"R", @"Ruby", @"MATLAB"];
+    
+    PYSearchViewController *searchVC = [PYSearchViewController searchViewControllerWithHotSearches:hotSeaches searchBarPlaceholder:@"搜索编程" didSearchBlock:^(PYSearchViewController *searchViewController, UISearchBar *searchBar, NSString *searchText) {
+       
+        
+    }];
+    searchVC.delegate = self;
+    //搜索风格
+    searchVC.searchHistoryStyle = PYHotSearchStyleDefault;
+    [self.navigationController pushViewController:searchVC animated:YES];
     
 }
 
@@ -101,6 +120,23 @@
     return _homeLeftBar;
 }
 
+#pragma mark - PYSearchViewControllerDelegate
+- (void)searchViewController:(PYSearchViewController *)searchViewController searchTextDidChange:(UISearchBar *)seachBar searchText:(NSString *)searchText
+{
+    if (searchText.length) { // 与搜索条件再搜索
+        // 根据条件发送查询（这里模拟搜索）
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ // 搜素完毕
+            // 显示建议搜索结果
+            NSMutableArray *searchSuggestionsM = [NSMutableArray array];
+            for (int i = 0; i < arc4random_uniform(5) + 10; i++) {
+                NSString *searchSuggestion = [NSString stringWithFormat:@"搜索建议 %d", i];
+                [searchSuggestionsM addObject:searchSuggestion];
+            }
+            // 返回
+            searchViewController.searchSuggestions = searchSuggestionsM;
+        });
+    }
+}
 
 
 @end
